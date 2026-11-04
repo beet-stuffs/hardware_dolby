@@ -10,6 +10,7 @@ PRODUCT_COPY_FILES += \
     hardware/dolby/proprietary/vendor/etc/init/vendor.dolby.media.c2-default-service-dax.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/vendor.dolby.media.c2-default-service-dax.rc
 
 PRODUCT_PACKAGES += \
+    libaudio_aidl_conversion_common_ndk-dax \
     libcodec2_soft_ac4dec \
     libcodec2_soft_common-dax \
     libcodec2_soft_ddpdec \
