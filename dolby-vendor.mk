@@ -24,12 +24,10 @@ PRODUCT_PACKAGES += \
     libdlbdsservice \
     libdlbpreg \
     libdmshal \
-    libspatializerparamstorage \
     libtsr_codec2_store \
     libdlbvolaidl \
     libswdapaidl \
     libswgamedapaidl \
-    libswspatializeraidl \
     vendor.dolby.dms-V1-ndk \
     vendor.dolby.hardware.dms@2.0 \
     dms-service.xml \
