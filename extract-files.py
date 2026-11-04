@@ -40,12 +40,14 @@ blob_fixups: blob_fixups_user_type = {
         .binary_regex_replace(
             rb'\x1f\x01\x09\xeb\x41\x01\x00\x54\xe0\x03\x13\x2a\xfc\xab\x40\xf9',
             b'\x1f\x01\x09\xeb\x41\x01\x00\x54\x20\x00\x80\x52\xfc\xab\x40\xf9',
-        ),
+        )
+        # libaudio_aidl_conversion_common_ndk pulls in common.types-V5-ndk which
+        # conflicts with common.types-V4-ndk (brought in by effect-V3-ndk)
+        .remove_needed('libaudio_aidl_conversion_common_ndk.so')
+        .replace_needed('android.hardware.audio.effect-V2-ndk.so', 'android.hardware.audio.effect-V3-ndk.so')
+        .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so'),
     (
         'vendor/lib64/soundfx/libdlbvolaidl.so',
-        'vendor/lib64/soundfx/libswdapaidl.so',
-        'vendor/lib64/soundfx/libswgamedapaidl.so',
-        'vendor/lib64/soundfx/libswspatializeraidl.so',
     ): blob_fixup()
         .replace_needed('android.hardware.audio.effect-V2-ndk.so', 'android.hardware.audio.effect-V3-ndk.so')
         .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so'),
