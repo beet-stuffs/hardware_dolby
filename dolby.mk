@@ -20,28 +20,16 @@ DOLBY_PATH := hardware/dolby
 # SEPolicy
 BOARD_VENDOR_SEPOLICY_DIRS += $(DOLBY_PATH)/sepolicy/vendor
 
-# HIDL
+# AIDL
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += $(DOLBY_PATH)/configs/vintf/dolby_framework_matrix.xml
-DEVICE_MANIFEST_FILE += \
-    $(DOLBY_PATH)/configs/vintf/vendor.dolby.hardware.dms@2.0-service.xml \
-    $(DOLBY_PATH)/configs/vintf/vendor.dolby.media.c2@1.0-service.xml
-
-# Configs
-PRODUCT_COPY_FILES += \
-    $(DOLBY_PATH)/configs/dax/dax-default.xml:$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default.xml \
-    $(DOLBY_PATH)/configs/media/media_codecs_dolby_audio.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_dolby_audio.xml
 
 # Dolby
 PRODUCT_VENDOR_PROPERTIES += \
-    ro.vendor.dolby.dax.version=DAX3_3.7.0.8_r1
+    ro.vendor.dolby.dax.version=DAX3_3.13.0.9_r1
 
 # DolbyManager
 PRODUCT_PACKAGES += \
     DolbyManager
-
-# Codec2
-PRODUCT_PACKAGES += \
-    vendor.dolby.media.c2@1.0-service
 
 # Proprietary-files
 $(call inherit-product, $(DOLBY_PATH)/dolby-vendor.mk)
