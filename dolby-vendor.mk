@@ -6,21 +6,29 @@ PRODUCT_SOONG_NAMESPACES += \
     hardware/dolby
 
 PRODUCT_COPY_FILES += \
-    hardware/dolby/proprietary/vendor/etc/init/vendor.dolby.hardware.dms@2.0-service.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/vendor.dolby.hardware.dms@2.0-service.rc
+    hardware/dolby/proprietary/vendor/etc/init/dms-service.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/dms-service.rc \
+    hardware/dolby/proprietary/vendor/etc/init/vendor.dolby.media.c2-default-service-dax.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/vendor.dolby.media.c2-default-service-dax.rc
 
 PRODUCT_PACKAGES += \
-    libdapparamstorage \
-    libdlbpreg \
-    libdlbvol \
-    libswdap \
-    libswgamedap \
-    libswvqe \
-    vendor.dolby.hardware.dms@2.0 \
     libcodec2_soft_ac4dec \
+    libcodec2_soft_common \
     libcodec2_soft_ddpdec \
-    libcodec2_soft_dolby \
+    libcodec2_soft_mha1dec \
+    libcodec2_soft_mhm1dec \
     libcodec2_store_dolby \
+    libdapparamstorage \
     libdeccfg \
     libdlbdsservice \
-    vendor.dolby.hardware.dms@2.0-impl \
-    vendor.dolby.hardware.dms@2.0-service
+    libdlbpreg \
+    libdmshal \
+    libspatializerparamstorage \
+    libdlbvolaidl \
+    libswdapaidl \
+    libswgamedapaidl \
+    libswspatializeraidl \
+    vendor.dolby.dms-V1-ndk \
+    vendor.dolby.hardware.dms@2.0 \
+    dms-service.xml \
+    vendor.dolby.media.c2-default-service-dax.xml \
+    vendor.dolby.dms.service \
+    vendor.dolby.media.c2-default-service-dax

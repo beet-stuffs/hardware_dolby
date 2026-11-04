@@ -22,9 +22,6 @@ BOARD_VENDOR_SEPOLICY_DIRS += $(DOLBY_PATH)/sepolicy/vendor
 
 # HIDL
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += $(DOLBY_PATH)/configs/vintf/dolby_framework_matrix.xml
-DEVICE_MANIFEST_FILE += \
-    $(DOLBY_PATH)/configs/vintf/vendor.dolby.hardware.dms@2.0-service.xml \
-    $(DOLBY_PATH)/configs/vintf/vendor.dolby.media.c2@1.0-service.xml
 
 # Configs
 PRODUCT_COPY_FILES += \
@@ -33,15 +30,11 @@ PRODUCT_COPY_FILES += \
 
 # Dolby
 PRODUCT_VENDOR_PROPERTIES += \
-    ro.vendor.dolby.dax.version=DAX3_3.7.0.8_r1
+    ro.vendor.dolby.dax.version=DAX3_3.13.0.9_r1
 
 # DolbyManager
 PRODUCT_PACKAGES += \
     DolbyManager
-
-# Codec2
-PRODUCT_PACKAGES += \
-    vendor.dolby.media.c2@1.0-service
 
 # Proprietary-files
 $(call inherit-product, $(DOLBY_PATH)/dolby-vendor.mk)

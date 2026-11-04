@@ -1,30 +1,35 @@
-# All blobs are extracted from Sony Xperia 1 V (pdx234) sssi-user 15 67.2.A.3.178
+# All blobs are extracted from Sony Xperia 1 VII (pdx256) 16 71.2.A.2.35
 
 # Dolby Audio Codec2
 vendor/lib64/libcodec2_soft_ac4dec.so
+vendor/lib64/libcodec2_soft_common.so
 vendor/lib64/libcodec2_soft_ddpdec.so
-vendor/lib64/libcodec2_soft_dolby.so
+vendor/lib64/libcodec2_soft_mha1dec.so
+vendor/lib64/libcodec2_soft_mhm1dec.so
 vendor/lib64/libcodec2_store_dolby.so
 vendor/lib64/libdeccfg.so
 
 # Dolby Audio Effects
-vendor/lib/libdapparamstorage.so
-vendor/lib/libdlbpreg.so
-vendor/lib/soundfx/libdlbvol.so
-vendor/lib/soundfx/libswdap.so
-vendor/lib/soundfx/libswgamedap.so
-vendor/lib/soundfx/libswvqe.so
 vendor/lib64/libdapparamstorage.so
 vendor/lib64/libdlbdsservice.so
 vendor/lib64/libdlbpreg.so
-vendor/lib64/soundfx/libdlbvol.so
-vendor/lib64/soundfx/libswdap.so
-vendor/lib64/soundfx/libswgamedap.so
-vendor/lib64/soundfx/libswvqe.so
+vendor/lib64/soundfx/libdlbvolaidl.so
+vendor/lib64/soundfx/libswdapaidl.so
+vendor/lib64/soundfx/libswgamedapaidl.so
+vendor/lib64/soundfx/libswspatializeraidl.so
+
+# Dolby spatializer
+vendor/lib64/libspatializerparamstorage.so
 
 # Dolby DMS HAL
-vendor/bin/hw/vendor.dolby.hardware.dms@2.0-service
-vendor/etc/init/vendor.dolby.hardware.dms@2.0-service.rc
-vendor/lib/vendor.dolby.hardware.dms@2.0.so
-vendor/lib64/vendor.dolby.hardware.dms@2.0-impl.so
+vendor/bin/hw/vendor.dolby.dms.service
+vendor/etc/init/dms-service.rc
+vendor/lib64/libdmshal.so
+vendor/lib64/vendor.dolby.dms-V1-ndk.so
 vendor/lib64/vendor.dolby.hardware.dms@2.0.so
+
+# Dolby C2
+vendor/bin/hw/vendor.dolby.media.c2-default-service-dax
+vendor/etc/init/vendor.dolby.media.c2-default-service-dax.rc
+vendor/etc/vintf/manifest/dms-service.xml
+vendor/etc/vintf/manifest/vendor.dolby.media.c2-default-service-dax.xml
