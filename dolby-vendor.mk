@@ -14,7 +14,7 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_PACKAGES += \
     libcodec2_soft_ac4dec \
-    libcodec2_soft_common_vendor \
+    libcodec2_soft_common-dax \
     libcodec2_soft_ddpdec \
     libcodec2_soft_mha1dec \
     libcodec2_soft_mhm1dec \

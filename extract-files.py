@@ -51,6 +51,13 @@ blob_fixups: blob_fixups_user_type = {
     ): blob_fixup()
         .replace_needed('android.hardware.audio.effect-V2-ndk.so', 'android.hardware.audio.effect-V3-ndk.so')
         .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so'),
+    (
+        'vendor/lib64/libcodec2_soft_ac4dec.so',
+        'vendor/lib64/libcodec2_soft_ddpdec.so',
+        'vendor/lib64/libcodec2_soft_mha1dec.so',
+        'vendor/lib64/libcodec2_soft_mhm1dec.so',
+    ): blob_fixup()
+        .replace_needed('libcodec2_soft_common.so', 'libcodec2_soft_common-dax.so'),
 }  # fmt: skip
 
 
