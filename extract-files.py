@@ -41,14 +41,15 @@ blob_fixups: blob_fixups_user_type = {
             b'\x1f\x01\x09\xeb\x41\x01\x00\x54\x20\x00\x80\x52\xfc\xab\x40\xf9',
         )
         .replace_needed('android.hardware.audio.effect-V2-ndk.so', 'android.hardware.audio.effect-V3-ndk.so')
-        .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so'),
+        .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so')
+        .replace_needed('libaudio_aidl_conversion_common_ndk.so', 'libaudio_aidl_conversion_common_ndk-dax.so'),
     (
         'vendor/lib64/soundfx/libdlbvolaidl.so',
     ): blob_fixup()
         .replace_needed('android.hardware.audio.effect-V2-ndk.so', 'android.hardware.audio.effect-V3-ndk.so')
         .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so'),
     (
-        'vendor/lib64/libaudio_aidl_conversion_common_ndk.so',
+        'vendor/lib64/libaudio_aidl_conversion_common_ndk-dax.so',
     ): blob_fixup()
         .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so'),
     (

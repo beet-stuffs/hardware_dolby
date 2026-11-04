@@ -8,7 +8,7 @@ soong_namespace {
 }
 
 cc_prebuilt_library_shared {
-    name: "libaudio_aidl_conversion_common_ndk",
+    name: "libaudio_aidl_conversion_common_ndk-dax",
     owner: "dolby",
     strip: {
         none: true,
@@ -16,7 +16,7 @@ cc_prebuilt_library_shared {
     target: {
         android_arm64: {
             srcs: [
-                "proprietary/vendor/lib64/libaudio_aidl_conversion_common_ndk.so",
+                "proprietary/vendor/lib64/libaudio_aidl_conversion_common_ndk-dax.so",
             ],
             shared_libs: [
                 "android.media.audio.common.types-V4-ndk",
@@ -500,7 +500,7 @@ cc_prebuilt_library_shared {
                 "libutils",
                 "android.hardware.common-V2-ndk",
                 "android.hardware.common.fmq-V1-ndk",
-                "libaudio_aidl_conversion_common_ndk",
+                "libaudio_aidl_conversion_common_ndk-dax",
                 "libstagefright_foundation",
                 "libdapparamstorage",
                 "libdlbpreg",
@@ -546,7 +546,7 @@ cc_prebuilt_library_shared {
                 "libutils",
                 "android.hardware.common-V2-ndk",
                 "android.hardware.common.fmq-V1-ndk",
-                "libaudio_aidl_conversion_common_ndk",
+                "libaudio_aidl_conversion_common_ndk-dax",
                 "libc++",
                 "libc",
                 "libm",
