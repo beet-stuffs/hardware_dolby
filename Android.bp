@@ -46,7 +46,8 @@ cc_prebuilt_library_shared {
 }
 
 cc_prebuilt_library_shared {
-    name: "libcodec2_soft_common",
+    name: "libcodec2_soft_common_vendor",
+    stem: "libcodec2_soft_common",
     owner: "dolby",
     strip: {
         none: true,
