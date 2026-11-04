@@ -20,7 +20,6 @@ cc_prebuilt_library_shared {
             ],
             shared_libs: [
                 "android.media.audio.common.types-V4-ndk",
-                "android.hardware.audio.common-V3-ndk",
                 "liblog",
                 "libstagefright_foundation",
                 "libutils",
