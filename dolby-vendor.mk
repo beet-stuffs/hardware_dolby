@@ -25,6 +25,7 @@ PRODUCT_PACKAGES += \
     libdlbpreg \
     libdmshal \
     libspatializerparamstorage \
+    libtsr_codec2_store \
     libdlbvolaidl \
     libswdapaidl \
     libswgamedapaidl \
