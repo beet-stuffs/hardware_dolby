@@ -34,7 +34,6 @@ blob_fixups: blob_fixups_user_type = {
     (
         'vendor/lib64/soundfx/libswdapaidl.so',
         'vendor/lib64/soundfx/libswgamedapaidl.so',
-        'vendor/lib64/soundfx/libswspatializeraidl.so',
     ): blob_fixup()
         # DlbGenClass2::propIsMatched: mov w0, w19 -> mov w0, #1
         .binary_regex_replace(

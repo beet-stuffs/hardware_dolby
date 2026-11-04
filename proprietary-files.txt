@@ -17,10 +17,6 @@ vendor/lib64/libdlbpreg.so
 vendor/lib64/soundfx/libdlbvolaidl.so
 vendor/lib64/soundfx/libswdapaidl.so
 vendor/lib64/soundfx/libswgamedapaidl.so
-vendor/lib64/soundfx/libswspatializeraidl.so
-
-# Dolby spatializer
-vendor/lib64/libspatializerparamstorage.so
 
 # Dolby DMS HAL
 vendor/bin/hw/vendor.dolby.dms.service
