@@ -1,2 +1,2 @@
-allow mediacodec hal_aidl_dms_service:hwservice_manager find;
+allow mediacodec vendor_dms_service:service_manager find;
 binder_call(mediacodec, hal_aidl_dms_default)
