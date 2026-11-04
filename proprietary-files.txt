@@ -2,7 +2,7 @@
 
 # Dolby Audio Codec2
 vendor/lib64/libcodec2_soft_ac4dec.so
-vendor/lib64/libcodec2_soft_common.so
+vendor/lib64/libcodec2_soft_common.so:vendor/lib64/libcodec2_soft_common-dax.so;FIX_SONAME
 vendor/lib64/libcodec2_soft_ddpdec.so
 vendor/lib64/libcodec2_soft_mha1dec.so
 vendor/lib64/libcodec2_soft_mhm1dec.so

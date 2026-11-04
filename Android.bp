@@ -31,7 +31,7 @@ cc_prebuilt_library_shared {
                 "libcodec2_hal_common",
                 "libcodec2_vndk",
                 "libutils",
-                "libcodec2_soft_common",
+                "libcodec2_soft_common-dax",
                 "libcodec2_store_dolby",
                 "libc++",
                 "libc",
@@ -46,7 +46,7 @@ cc_prebuilt_library_shared {
 }
 
 cc_prebuilt_library_shared {
-    name: "libcodec2_soft_common",
+    name: "libcodec2_soft_common-dax",
     owner: "dolby",
     strip: {
         none: true,
@@ -54,7 +54,7 @@ cc_prebuilt_library_shared {
     target: {
         android_arm64: {
             srcs: [
-                "proprietary/vendor/lib64/libcodec2_soft_common.so",
+                "proprietary/vendor/lib64/libcodec2_soft_common-dax.so",
             ],
             shared_libs: [
                 "server_configurable_flags",
@@ -104,7 +104,7 @@ cc_prebuilt_library_shared {
                 "libcodec2_hal_common",
                 "libcodec2_vndk",
                 "libutils",
-                "libcodec2_soft_common",
+                "libcodec2_soft_common-dax",
                 "libcodec2_store_dolby",
                 "libc++",
                 "libc",
@@ -139,7 +139,7 @@ cc_prebuilt_library_shared {
                 "libcodec2_vndk",
                 "libutils",
                 "libtsr_codec2_store",
-                "libcodec2_soft_common",
+                "libcodec2_soft_common-dax",
                 "libsfplugin_ccodec_utils",
                 "libstagefright_foundation",
                 "libaudioutils",
@@ -176,7 +176,7 @@ cc_prebuilt_library_shared {
                 "libcodec2_vndk",
                 "libutils",
                 "libtsr_codec2_store",
-                "libcodec2_soft_common",
+                "libcodec2_soft_common-dax",
                 "libsfplugin_ccodec_utils",
                 "libstagefright_foundation",
                 "libaudioutils",
