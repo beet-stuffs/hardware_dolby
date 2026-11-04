@@ -51,7 +51,8 @@ blob_fixups: blob_fixups_user_type = {
     (
         'vendor/lib64/libaudio_aidl_conversion_common_ndk-dax.so',
     ): blob_fixup()
-        .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so'),
+        .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so')
+        .remove_needed('android.hardware.audio.common-V3-ndk.so'),
     (
         'vendor/lib64/libcodec2_soft_ac4dec.so',
         'vendor/lib64/libcodec2_soft_ddpdec.so',
