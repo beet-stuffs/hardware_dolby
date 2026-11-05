@@ -1,1 +1,2 @@
 attribute hal_aidl_dms;
+attribute hal_aidl_dms_server;
