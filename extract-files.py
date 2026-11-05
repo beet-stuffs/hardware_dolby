@@ -35,10 +35,17 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/lib64/soundfx/libswdapaidl.so',
         'vendor/lib64/soundfx/libswgamedapaidl.so',
     ): blob_fixup()
-        # DlbGenClass2::propIsMatched: mov w0, w19 -> mov w0, #1
+        # DlbGenClass2::check(): replace the prologue (paciasp; stp x29, x30,
+        # [sp, #-0x30]!) with mov w0, #1; ret so the Sony brand/model security
+        # gate passes on non-Sony devices. The bl before check() differs per
+        # library, hence a signature for each (one match each).
         .binary_regex_replace(
-            rb'\x1f\x01\x09\xeb\x41\x01\x00\x54\xe0\x03\x13\x2a\xfc\xab\x40\xf9',
-            b'\x1f\x01\x09\xeb\x41\x01\x00\x54\x20\x00\x80\x52\xfc\xab\x40\xf9',
+            rb'\xff\x43\x06\x91\xbf\x23\x03\xd5\xc0\x03\x5f\xd6\xbf\x0b\x00\x94\x3f\x23\x03\xd5\xfd\x7b\xbd\xa9',
+            b'\xff\x43\x06\x91\xbf\x23\x03\xd5\xc0\x03\x5f\xd6\xbf\x0b\x00\x94\x20\x00\x80\x52\xc0\x03\x5f\xd6',
+        )
+        .binary_regex_replace(
+            rb'\xff\x43\x06\x91\xbf\x23\x03\xd5\xc0\x03\x5f\xd6\x05\x22\x00\x94\x3f\x23\x03\xd5\xfd\x7b\xbd\xa9',
+            b'\xff\x43\x06\x91\xbf\x23\x03\xd5\xc0\x03\x5f\xd6\x05\x22\x00\x94\x20\x00\x80\x52\xc0\x03\x5f\xd6',
         )
         .replace_needed('android.hardware.audio.effect-V2-ndk.so', 'android.hardware.audio.effect-V3-ndk.so')
         .replace_needed('android.media.audio.common.types-V3-ndk.so', 'android.media.audio.common.types-V4-ndk.so')
