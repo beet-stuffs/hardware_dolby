@@ -195,9 +195,10 @@ internal class DolbyController private constructor(
         dlog(TAG, "restoreOutputSettings(profile=$profile, output=$output)")
 
         // Settings saved before they were split per output apply to both outputs.
-        fun getString(key: String, default: Int) =
-            (prefs.getString(DolbyConstants.outputPrefKey(key, output), null)
-                ?: prefs.getString(key, null))?.toIntOrNull() ?: default
+        fun getString(key: String, default: Int, mapLegacy: (Int) -> Int = { it }) =
+            prefs.getString(DolbyConstants.outputPrefKey(key, output), null)?.toIntOrNull()
+                ?: prefs.getString(key, null)?.toIntOrNull()?.let(mapLegacy)
+                ?: default
 
         fun getBoolean(key: String, default: Boolean): Boolean {
             val outputKey = DolbyConstants.outputPrefKey(key, output)
@@ -215,7 +216,9 @@ internal class DolbyController private constructor(
             output, profile
         )
         setIeqPreset(
-            getString(DolbyConstants.PREF_IEQ, getIeqPreset(output, profile)),
+            getString(DolbyConstants.PREF_IEQ, getIeqPreset(output, profile)) {
+                legacyIeqPreset(it)
+            },
             output, profile
         )
         setIeqAmount(
@@ -540,6 +543,16 @@ internal class DolbyController private constructor(
 
         @Volatile
         private var instance: DolbyController? = null
+
+        // The old tuning numbered the IEQ presets balanced, warm, detailed. Sony's tuning
+        // numbers them detailed, balanced, warm.
+        private fun legacyIeqPreset(preset: Int) =
+            when (preset) {
+                1 -> 2
+                2 -> 3
+                3 -> 1
+                else -> preset
+            }
 
         fun getInstance(context: Context) =
             instance ?: synchronized(this) {
