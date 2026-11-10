@@ -5,6 +5,7 @@
 -->
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:title="@string/dolby_title">
 
     <com.android.settingslib.widget.MainSwitchPreference
@@ -21,11 +22,17 @@
         android:summary="%s" />
 
     <PreferenceCategory
+        android:key="dolby_category_settings"
         android:title="@string/dolby_category_settings">
+
+        <SwitchPreferenceCompat
+            android:key="dolby_geq"
+            android:title="@string/dolby_geq_enable" />
 
         <Preference
             android:key="dolby_preset"
-            android:title="@string/dolby_preset">
+            android:title="@string/dolby_preset"
+            android:dependency="dolby_geq">
             <intent
                 android:action="android.intent.action.MAIN"
                 android:targetPackage="co.aospa.dolby"
@@ -37,6 +44,12 @@
             android:entries="@array/dolby_ieq_entries"
             android:entryValues="@array/dolby_ieq_values"
             android:title="@string/dolby_ieq" />
+
+        <SeekBarPreference
+            android:key="dolby_ieq_amount"
+            android:title="@string/dolby_ieq_amount"
+            android:max="16"
+            app:showSeekBarValue="true" />
 
         <SwitchPreferenceCompat
             android:key="dolby_spk_virtualizer"
@@ -59,13 +72,44 @@
             android:entryValues="@array/dolby_dialogue_values"
             android:title="@string/dolby_dialogue_enhancer" />
 
+        <SeekBarPreference
+            android:key="dolby_dialogue_ducking"
+            android:title="@string/dolby_dialogue_ducking"
+            android:summary="@string/dolby_dialogue_ducking_summary"
+            android:max="16"
+            app:showSeekBarValue="true" />
+
         <SwitchPreferenceCompat
             android:key="dolby_bass"
             android:title="@string/dolby_bass_enhancer" />
 
         <SwitchPreferenceCompat
+            android:key="dolby_virtual_bass"
+            android:title="@string/dolby_virtual_bass"
+            android:summary="@string/dolby_virtual_bass_summary" />
+
+        <SwitchPreferenceCompat
             android:key="dolby_volume"
             android:title="@string/dolby_volume_leveler" />
+
+        <SeekBarPreference
+            android:key="dolby_volume_amount"
+            android:title="@string/dolby_volume_leveler_amount"
+            android:dependency="dolby_volume"
+            android:max="10"
+            app:showSeekBarValue="true" />
+
+        <SwitchPreferenceCompat
+            android:key="dolby_reverb"
+            android:title="@string/dolby_reverb_reduction"
+            android:summary="@string/dolby_reverb_reduction_summary" />
+
+        <SeekBarPreference
+            android:key="dolby_reverb_amount"
+            android:title="@string/dolby_reverb_reduction_amount"
+            android:dependency="dolby_reverb"
+            android:max="16"
+            app:showSeekBarValue="true" />
 
         <Preference
             android:key="dolby_reset"
