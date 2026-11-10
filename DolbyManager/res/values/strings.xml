@@ -19,12 +19,23 @@
     <string name="dolby_unknown">Unknown</string>
     <string name="dolby_on_with_profile">On (%1$s)</string>
     <string name="dolby_category_settings">Settings</string>
+    <string name="dolby_category_speaker">Speaker settings</string>
+    <string name="dolby_category_headphone">Headphone settings</string>
+    <string name="dolby_geq_enable">Use graphic equalizer</string>
     <string name="dolby_bass_enhancer">Bass enhancer</string>
+    <string name="dolby_virtual_bass">Virtual bass</string>
+    <string name="dolby_virtual_bass_summary">Adds harmonics so low bass can be heard on small speakers</string>
     <string name="dolby_dialogue_enhancer">Dialogue enhancer</string>
+    <string name="dolby_dialogue_ducking">Dialogue ducking</string>
+    <string name="dolby_dialogue_ducking_summary">Lowers other sounds while dialogue is playing</string>
     <string name="dolby_spk_virtualizer">Speaker virtualization</string>
     <string name="dolby_hp_virtualizer">Headphone virtualization</string>
     <string name="dolby_stereo_widening">Stereo widening</string>
     <string name="dolby_volume_leveler">Volume leveler</string>
+    <string name="dolby_volume_leveler_amount">Volume leveler amount</string>
+    <string name="dolby_reverb_reduction">Reverb reduction</string>
+    <string name="dolby_reverb_reduction_summary">Reduces room echo in voices and recordings</string>
+    <string name="dolby_reverb_reduction_amount">Reverb reduction amount</string>
     <string name="dolby_connect_headphones">Connect headphones</string>
     <string name="dolby_reset_profile">Reset to defaults</string>
     <string name="dolby_reset_profile_toast">Successfully reset settings for %1$s profile</string>
@@ -63,6 +74,7 @@
 
     <!-- Dolby intelligent EQ -->
     <string name="dolby_ieq">Intelligent equalizer</string>
+    <string name="dolby_ieq_amount">Intelligent equalizer amount</string>
     <string name="dolby_balanced">Balanced</string>
     <string name="dolby_warm">Warm</string>
     <string name="dolby_detailed">Detailed</string>

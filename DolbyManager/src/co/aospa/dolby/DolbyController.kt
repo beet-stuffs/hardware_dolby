@@ -7,6 +7,7 @@
 package co.aospa.dolby
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
@@ -22,6 +23,7 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import co.aospa.dolby.DolbyConstants.Companion.dlog
 import co.aospa.dolby.DolbyConstants.DsParam
+import co.aospa.dolby.DolbyConstants.Output
 import co.aospa.dolby.R
 
 internal class DolbyController private constructor(
@@ -161,13 +163,6 @@ internal class DolbyController private constructor(
             prefs.getString(DolbyConstants.PREF_PRESET, getPreset(profile))!!,
             profile
         )
-        setIeqPreset(
-            prefs.getString(
-                DolbyConstants.PREF_IEQ,
-                getIeqPreset(profile).toString()
-            )!!.toInt(),
-            profile
-        )
         setHeadphoneVirtEnabled(
             prefs.getBoolean(DolbyConstants.PREF_HP_VIRTUALIZER, getHeadphoneVirtEnabled(profile)),
             profile
@@ -185,20 +180,74 @@ internal class DolbyController private constructor(
             )!!.toInt(),
             profile
         )
-        setDialogueEnhancerAmount(
-            prefs.getString(
-                DolbyConstants.PREF_DIALOGUE,
-                getDialogueEnhancerAmount(profile).toString()
-            )!!.toInt(),
+        setReverbReductionEnabled(
+            prefs.getBoolean(DolbyConstants.PREF_REVERB, getReverbReductionEnabled(profile)),
             profile
+        )
+        setReverbReductionAmount(
+            prefs.getInt(DolbyConstants.PREF_REVERB_AMOUNT, getReverbReductionAmount(profile)),
+            profile
+        )
+        Output.values().forEach { restoreOutputSettings(prefs, profile, it) }
+    }
+
+    private fun restoreOutputSettings(prefs: SharedPreferences, profile: Int, output: Output) {
+        dlog(TAG, "restoreOutputSettings(profile=$profile, output=$output)")
+
+        // Settings saved before they were split per output apply to both outputs.
+        fun getString(key: String, default: Int) =
+            (prefs.getString(DolbyConstants.outputPrefKey(key, output), null)
+                ?: prefs.getString(key, null))?.toIntOrNull() ?: default
+
+        fun getBoolean(key: String, default: Boolean): Boolean {
+            val outputKey = DolbyConstants.outputPrefKey(key, output)
+            return when {
+                prefs.contains(outputKey) -> prefs.getBoolean(outputKey, default)
+                else -> prefs.getBoolean(key, default)
+            }
+        }
+
+        fun getInt(key: String, default: Int) =
+            prefs.getInt(DolbyConstants.outputPrefKey(key, output), default)
+
+        setGeqEnabled(
+            getBoolean(DolbyConstants.PREF_GEQ, getGeqEnabled(output, profile)),
+            output, profile
+        )
+        setIeqPreset(
+            getString(DolbyConstants.PREF_IEQ, getIeqPreset(output, profile)),
+            output, profile
+        )
+        setIeqAmount(
+            getInt(DolbyConstants.PREF_IEQ_AMOUNT, getIeqAmount(output, profile)),
+            output, profile
+        )
+        setDialogueEnhancerAmount(
+            getString(DolbyConstants.PREF_DIALOGUE, getDialogueEnhancerAmount(output, profile)),
+            output, profile
+        )
+        setDialogueEnhancerDucking(
+            getInt(
+                DolbyConstants.PREF_DIALOGUE_DUCKING,
+                getDialogueEnhancerDucking(output, profile)
+            ),
+            output, profile
         )
         setBassEnhancerEnabled(
-            prefs.getBoolean(DolbyConstants.PREF_BASS, getBassEnhancerEnabled(profile)),
-            profile
+            getBoolean(DolbyConstants.PREF_BASS, getBassEnhancerEnabled(output, profile)),
+            output, profile
+        )
+        setVirtualBassEnabled(
+            getBoolean(DolbyConstants.PREF_VIRTUAL_BASS, getVirtualBassEnabled(output, profile)),
+            output, profile
         )
         setVolumeLevelerEnabled(
-            prefs.getBoolean(DolbyConstants.PREF_VOLUME, getVolumeLevelerEnabled(profile)),
-            profile
+            getBoolean(DolbyConstants.PREF_VOLUME, getVolumeLevelerEnabled(output, profile)),
+            output, profile
+        )
+        setVolumeLevelerAmount(
+            getInt(DolbyConstants.PREF_VOLUME_AMOUNT, getVolumeLevelerAmount(output, profile)),
+            output, profile
         )
     }
 
@@ -304,50 +353,56 @@ internal class DolbyController private constructor(
         }
     }
 
+    // Most settings belong to an endpoint of the tuning (speaker or headphone), so they are
+    // set through the tuning ports of that output instead of whatever output is active.
+
+    private fun getOutputParameter(param: DsParam, output: Output, profile: Int): IntArray =
+        dolbyEffect.getDapParameter(param, profile, output.ports.first())
+
+    private fun setOutputParameter(param: DsParam, values: IntArray, output: Output, profile: Int) {
+        checkEffect()
+        output.ports.forEach { port ->
+            runCatching { dolbyEffect.setDapParameter(param, values, profile, port) }
+                .onFailure { Log.e(TAG, "Failed to set $param on $port", it) }
+        }
+    }
+
+    private fun getOutputBool(param: DsParam, output: Output, profile: Int) =
+        getOutputParameter(param, output, profile)[0] == 1
+
+    private fun getOutputInt(param: DsParam, output: Output, profile: Int) =
+        getOutputParameter(param, output, profile)[0]
+
+    private fun setOutputParameter(param: DsParam, value: Boolean, output: Output, profile: Int) =
+        setOutputParameter(param, intArrayOf(if (value) 1 else 0), output, profile)
+
+    private fun setOutputParameter(param: DsParam, value: Int, output: Output, profile: Int) =
+        setOutputParameter(param, intArrayOf(value), output, profile)
+
+    // The virtualizers are the virtualizer of the speaker and headphone endpoints.
+
     fun getHeadphoneVirtEnabled(profile: Int = this.profile) =
-        dolbyEffect.getDapParameterBool(DsParam.HEADPHONE_VIRTUALIZER, profile).also {
+        getOutputBool(DsParam.HEADPHONE_VIRTUALIZER, Output.HEADPHONE, profile).also {
             dlog(TAG, "getHeadphoneVirtEnabled: $it")
         }
 
     fun setHeadphoneVirtEnabled(value: Boolean, profile: Int = this.profile) {
         dlog(TAG, "setHeadphoneVirtEnabled: $value")
-        checkEffect()
-        dolbyEffect.setDapParameter(DsParam.HEADPHONE_VIRTUALIZER, value, profile)
+        setOutputParameter(DsParam.HEADPHONE_VIRTUALIZER, value, Output.HEADPHONE, profile)
     }
 
     fun getSpeakerVirtEnabled(profile: Int = this.profile) =
-        dolbyEffect.getDapParameterBool(DsParam.SPEAKER_VIRTUALIZER, profile).also {
+        getOutputBool(DsParam.SPEAKER_VIRTUALIZER, Output.SPEAKER, profile).also {
             dlog(TAG, "getSpeakerVirtEnabled: $it")
         }
 
     fun setSpeakerVirtEnabled(value: Boolean, profile: Int = this.profile) {
         dlog(TAG, "setSpeakerVirtEnabled: $value")
         if (isMonoSpeaker) return
-        checkEffect()
-        dolbyEffect.setDapParameter(DsParam.SPEAKER_VIRTUALIZER, value, profile)
+        setOutputParameter(DsParam.SPEAKER_VIRTUALIZER, value, Output.SPEAKER, profile)
     }
 
-    fun getBassEnhancerEnabled(profile: Int = this.profile) =
-        dolbyEffect.getDapParameterBool(DsParam.BASS_ENHANCER_ENABLE, profile).also {
-            dlog(TAG, "getBassEnhancerEnabled: $it")
-        }
-
-    fun setBassEnhancerEnabled(value: Boolean, profile: Int = this.profile) {
-        dlog(TAG, "setBassEnhancerEnabled: $value")
-        checkEffect()
-        dolbyEffect.setDapParameter(DsParam.BASS_ENHANCER_ENABLE, value, profile)
-    }
-
-    fun getVolumeLevelerEnabled(profile: Int = this.profile) =
-        dolbyEffect.getDapParameterBool(DsParam.VOLUME_LEVELER_ENABLE, profile).also {
-            dlog(TAG, "getVolumeLevelerEnabled: $it")
-        }
-
-    fun setVolumeLevelerEnabled(value: Boolean, profile: Int = this.profile) {
-        dlog(TAG, "setVolumeLevelerEnabled: $value")
-        checkEffect()
-        dolbyEffect.setDapParameter(DsParam.VOLUME_LEVELER_ENABLE, value, profile)
-    }
+    // Settings of the whole profile.
 
     fun getStereoWideningAmount(profile: Int = this.profile) =
         dolbyEffect.getDapParameterInt(DsParam.STEREO_WIDENING_AMOUNT, profile).also {
@@ -360,31 +415,123 @@ internal class DolbyController private constructor(
         dolbyEffect.setDapParameter(DsParam.STEREO_WIDENING_AMOUNT, value, profile)
     }
 
-    fun getDialogueEnhancerAmount(profile: Int = this.profile): Int {
-        val enabled = dolbyEffect.getDapParameterBool(DsParam.DIALOGUE_ENHANCER_ENABLE, profile)
+    fun getReverbReductionEnabled(profile: Int = this.profile) =
+        dolbyEffect.getDapParameterBool(DsParam.REVERB_REDUCTION_ENABLE, profile).also {
+            dlog(TAG, "getReverbReductionEnabled: $it")
+        }
+
+    fun setReverbReductionEnabled(value: Boolean, profile: Int = this.profile) {
+        dlog(TAG, "setReverbReductionEnabled: $value")
+        checkEffect()
+        dolbyEffect.setDapParameter(DsParam.REVERB_REDUCTION_ENABLE, value, profile)
+    }
+
+    fun getReverbReductionAmount(profile: Int = this.profile) =
+        dolbyEffect.getDapParameterInt(DsParam.REVERB_REDUCTION_AMOUNT, profile).also {
+            dlog(TAG, "getReverbReductionAmount: $it")
+        }
+
+    fun setReverbReductionAmount(value: Int, profile: Int = this.profile) {
+        dlog(TAG, "setReverbReductionAmount: $value")
+        checkEffect()
+        dolbyEffect.setDapParameter(DsParam.REVERB_REDUCTION_AMOUNT, value, profile)
+    }
+
+    // Settings of each output.
+
+    fun getGeqEnabled(output: Output, profile: Int = this.profile) =
+        getOutputBool(DsParam.GEQ_ENABLE, output, profile).also {
+            dlog(TAG, "getGeqEnabled($output): $it")
+        }
+
+    fun setGeqEnabled(value: Boolean, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setGeqEnabled($output): $value")
+        setOutputParameter(DsParam.GEQ_ENABLE, value, output, profile)
+    }
+
+    fun getIeqPreset(output: Output, profile: Int = this.profile) =
+        getOutputInt(DsParam.IEQ_PRESET, output, profile).also {
+            dlog(TAG, "getIeqPreset($output): $it")
+        }
+
+    fun setIeqPreset(value: Int, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setIeqPreset($output): $value")
+        setOutputParameter(DsParam.IEQ_PRESET, value, output, profile)
+    }
+
+    fun getIeqAmount(output: Output, profile: Int = this.profile) =
+        getOutputInt(DsParam.IEQ_AMOUNT, output, profile).also {
+            dlog(TAG, "getIeqAmount($output): $it")
+        }
+
+    fun setIeqAmount(value: Int, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setIeqAmount($output): $value")
+        setOutputParameter(DsParam.IEQ_AMOUNT, value, output, profile)
+    }
+
+    fun getDialogueEnhancerAmount(output: Output, profile: Int = this.profile): Int {
+        val enabled = getOutputBool(DsParam.DIALOGUE_ENHANCER_ENABLE, output, profile)
         val amount = if (enabled) {
-            dolbyEffect.getDapParameterInt(DsParam.DIALOGUE_ENHANCER_AMOUNT, profile)
+            getOutputInt(DsParam.DIALOGUE_ENHANCER_AMOUNT, output, profile)
         } else 0
-        dlog(TAG, "getDialogueEnhancerAmount: enabled=$enabled amount=$amount")
+        dlog(TAG, "getDialogueEnhancerAmount($output): enabled=$enabled amount=$amount")
         return amount
     }
 
-    fun setDialogueEnhancerAmount(value: Int, profile: Int = this.profile) {
-        dlog(TAG, "setDialogueEnhancerAmount: $value")
-        checkEffect()
-        dolbyEffect.setDapParameter(DsParam.DIALOGUE_ENHANCER_ENABLE, (value > 0), profile)
-        dolbyEffect.setDapParameter(DsParam.DIALOGUE_ENHANCER_AMOUNT, value, profile)
+    fun setDialogueEnhancerAmount(value: Int, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setDialogueEnhancerAmount($output): $value")
+        setOutputParameter(DsParam.DIALOGUE_ENHANCER_ENABLE, (value > 0), output, profile)
+        setOutputParameter(DsParam.DIALOGUE_ENHANCER_AMOUNT, value, output, profile)
     }
 
-    fun getIeqPreset(profile: Int = this.profile) =
-        dolbyEffect.getDapParameterInt(DsParam.IEQ_PRESET, profile).also {
-            dlog(TAG, "getIeqPreset: $it")
+    fun getDialogueEnhancerDucking(output: Output, profile: Int = this.profile) =
+        getOutputInt(DsParam.DIALOGUE_ENHANCER_DUCKING, output, profile).also {
+            dlog(TAG, "getDialogueEnhancerDucking($output): $it")
         }
 
-    fun setIeqPreset(value: Int, profile: Int = this.profile) {
-        dlog(TAG, "setIeqPreset: $value")
-        checkEffect()
-        dolbyEffect.setDapParameter(DsParam.IEQ_PRESET, value, profile)
+    fun setDialogueEnhancerDucking(value: Int, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setDialogueEnhancerDucking($output): $value")
+        setOutputParameter(DsParam.DIALOGUE_ENHANCER_DUCKING, value, output, profile)
+    }
+
+    fun getBassEnhancerEnabled(output: Output, profile: Int = this.profile) =
+        getOutputBool(DsParam.BASS_ENHANCER_ENABLE, output, profile).also {
+            dlog(TAG, "getBassEnhancerEnabled($output): $it")
+        }
+
+    fun setBassEnhancerEnabled(value: Boolean, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setBassEnhancerEnabled($output): $value")
+        setOutputParameter(DsParam.BASS_ENHANCER_ENABLE, value, output, profile)
+    }
+
+    fun getVirtualBassEnabled(output: Output, profile: Int = this.profile) =
+        getOutputBool(DsParam.VIRTUAL_BASS_ENABLE, output, profile).also {
+            dlog(TAG, "getVirtualBassEnabled($output): $it")
+        }
+
+    fun setVirtualBassEnabled(value: Boolean, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setVirtualBassEnabled($output): $value")
+        setOutputParameter(DsParam.VIRTUAL_BASS_ENABLE, value, output, profile)
+    }
+
+    fun getVolumeLevelerEnabled(output: Output, profile: Int = this.profile) =
+        getOutputBool(DsParam.VOLUME_LEVELER_ENABLE, output, profile).also {
+            dlog(TAG, "getVolumeLevelerEnabled($output): $it")
+        }
+
+    fun setVolumeLevelerEnabled(value: Boolean, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setVolumeLevelerEnabled($output): $value")
+        setOutputParameter(DsParam.VOLUME_LEVELER_ENABLE, value, output, profile)
+    }
+
+    fun getVolumeLevelerAmount(output: Output, profile: Int = this.profile) =
+        getOutputInt(DsParam.VOLUME_LEVELER_AMOUNT, output, profile).also {
+            dlog(TAG, "getVolumeLevelerAmount($output): $it")
+        }
+
+    fun setVolumeLevelerAmount(value: Int, output: Output, profile: Int = this.profile) {
+        dlog(TAG, "setVolumeLevelerAmount($output): $value")
+        setOutputParameter(DsParam.VOLUME_LEVELER_AMOUNT, value, output, profile)
     }
 
     companion object {
