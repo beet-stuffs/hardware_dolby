@@ -12,7 +12,12 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.AudioManager.AudioPlaybackCallback
 import android.media.AudioPlaybackConfiguration
+import android.media.AudioRoutesInfo
+import android.media.IAudioRoutesObserver
+import android.media.IAudioService
 import android.os.Handler
+import android.os.RemoteException
+import android.os.ServiceManager
 import android.util.Log
 import androidx.preference.PreferenceManager
 import co.aospa.dolby.DolbyConstants.Companion.dlog
@@ -22,9 +27,37 @@ import co.aospa.dolby.R
 internal class DolbyController private constructor(
     private val context: Context
 ) {
-    private var dolbyEffect = DolbyAudioEffect(EFFECT_PRIORITY, audioSession = 0)
+    private var dolbyEffect = createEffect()
     private val audioManager = context.getSystemService(AudioManager::class.java)
     private val handler = Handler(context.mainLooper)
+    private val dmsClient = DolbyDmsClient(handler)
+
+    // The speaker virtualizer is not supported on mono speakers.
+    val isMonoSpeaker: Boolean by lazy {
+        runCatching { dolbyEffect.isMonoSpeaker }
+            .onFailure { Log.e(TAG, "Failed to query mono speaker", it) }
+            .getOrDefault(false)
+            .also { dlog(TAG, "isMonoSpeaker: $it") }
+    }
+
+    // Tell the Dolby media service which output is active, like Sony's daxService.
+    private val audioRoutesObserver = object : IAudioRoutesObserver.Stub() {
+        override fun dispatchAudioRoutesChanged(info: AudioRoutesInfo) {
+            handler.post { updateActiveDevice(info) }
+        }
+    }
+
+    // The effect is gone after audioserver restarts, recreate it and restore our settings.
+    private val audioServerStateCallback = object : AudioManager.AudioServerStateCallback() {
+        override fun onAudioServerUp() {
+            Log.i(TAG, "audioserver restarted, restoring settings")
+            handler.post {
+                dolbyEffect.release()
+                dolbyEffect = createEffect()
+                restoreAllSettings()
+            }
+        }
+    }
 
     // Restore current profile on every media session
     private val playbackCallback = object : AudioPlaybackCallback() {
@@ -96,6 +129,13 @@ internal class DolbyController private constructor(
 
     fun onBootCompleted() {
         dlog(TAG, "onBootCompleted")
+        restoreAllSettings()
+        audioManager!!.setAudioServerStateCallback(context.mainExecutor, audioServerStateCallback)
+        startWatchingRoutes()
+    }
+
+    private fun restoreAllSettings() {
+        dlog(TAG, "restoreAllSettings")
 
         // Restore our main settings
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -132,10 +172,12 @@ internal class DolbyController private constructor(
             prefs.getBoolean(DolbyConstants.PREF_HP_VIRTUALIZER, getHeadphoneVirtEnabled(profile)),
             profile
         )
-        setSpeakerVirtEnabled(
-            prefs.getBoolean(DolbyConstants.PREF_SPK_VIRTUALIZER, getSpeakerVirtEnabled(profile)),
-            profile
-        )
+        if (!isMonoSpeaker) {
+            setSpeakerVirtEnabled(
+                prefs.getBoolean(DolbyConstants.PREF_SPK_VIRTUALIZER, getSpeakerVirtEnabled(profile)),
+                profile
+            )
+        }
         setStereoWideningAmount(
             prefs.getString(
                 DolbyConstants.PREF_STEREO,
@@ -160,12 +202,48 @@ internal class DolbyController private constructor(
         )
     }
 
+    private fun createEffect() =
+        DolbyAudioEffect(EFFECT_PRIORITY, audioSession = 0).apply {
+            setDapParameterListener { param, value ->
+                dlog(TAG, "onDapParameterChanged: param=$param value=$value")
+            }
+        }
+
     private fun checkEffect() {
         if (!dolbyEffect.hasControl()) {
             Log.w(TAG, "lost control, recreating effect")
             dolbyEffect.release()
-            dolbyEffect = DolbyAudioEffect(EFFECT_PRIORITY, audioSession = 0)
+            dolbyEffect = createEffect()
         }
+    }
+
+    private fun startWatchingRoutes() {
+        val audioService = IAudioService.Stub.asInterface(
+            ServiceManager.getService(Context.AUDIO_SERVICE)
+        )
+        try {
+            audioService.startWatchingRoutes(audioRoutesObserver)?.let { updateActiveDevice(it) }
+        } catch (e: RemoteException) {
+            Log.e(TAG, "Failed to watch audio routes", e)
+        }
+    }
+
+    // Same mapping as Sony's daxService (71.2): any A2DP output is reported as generic A2DP.
+    private fun updateActiveDevice(info: AudioRoutesInfo) {
+        val device = if (info.bluetoothName != null && audioManager!!.isBluetoothA2dpOn) {
+            DolbyDmsClient.DEVICE_BLUETOOTH_A2DP
+        } else {
+            when (info.mainType) {
+                AudioRoutesInfo.MAIN_HEADSET -> DolbyDmsClient.DEVICE_WIRED_HEADSET
+                AudioRoutesInfo.MAIN_HEADPHONES -> DolbyDmsClient.DEVICE_WIRED_HEADPHONE
+                AudioRoutesInfo.MAIN_DOCK_SPEAKERS -> DolbyDmsClient.DEVICE_DOCK
+                AudioRoutesInfo.MAIN_HDMI -> DolbyDmsClient.DEVICE_HDMI
+                AudioRoutesInfo.MAIN_USB -> DolbyDmsClient.DEVICE_USB
+                else -> DolbyDmsClient.DEVICE_SPEAKER
+            }
+        }
+        dlog(TAG, "updateActiveDevice: routes=$info device=0x${Integer.toHexString(device)}")
+        dmsClient.setActiveDevice(device)
     }
 
     private fun setCurrentProfile() {
@@ -244,6 +322,7 @@ internal class DolbyController private constructor(
 
     fun setSpeakerVirtEnabled(value: Boolean, profile: Int = this.profile) {
         dlog(TAG, "setSpeakerVirtEnabled: $value")
+        if (isMonoSpeaker) return
         checkEffect()
         dolbyEffect.setDapParameter(DsParam.SPEAKER_VIRTUALIZER, value, profile)
     }

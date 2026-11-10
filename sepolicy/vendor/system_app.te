@@ -1,0 +1,3 @@
+# DolbyManager runs as system_app and tells the Dolby media service the active output device
+allow system_app vendor_dms_service:service_manager find;
+binder_call(system_app, hal_aidl_dms_default)
