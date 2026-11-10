@@ -10,16 +10,38 @@ import android.util.Log
 
 class DolbyConstants {
 
+    // Matches com.dolby.dax.DsParams in daxService 67.2.A.3.178.
     enum class DsParam(val id: Int, val length: Int = 1) {
         HEADPHONE_VIRTUALIZER(101),
         SPEAKER_VIRTUALIZER(102),
         VOLUME_LEVELER_ENABLE(103),
         IEQ_PRESET(104),
         DIALOGUE_ENHANCER_ENABLE(105),
+        GEQ_ENABLE(106),
+        IEQ_AMOUNT(107),
         DIALOGUE_ENHANCER_AMOUNT(108),
+        DIALOGUE_ENHANCER_DUCKING(109),
         GEQ_BAND_GAINS(110, 20),
         BASS_ENHANCER_ENABLE(111),
-        STEREO_WIDENING_AMOUNT(113);
+        VIRTUAL_BASS_ENABLE(112),
+        STEREO_WIDENING_AMOUNT(113),
+        REVERB_REDUCTION_ENABLE(114),
+        REVERB_REDUCTION_AMOUNT(115),
+        VOLUME_LEVELER_AMOUNT(116);
+
+        override fun toString(): String {
+            return "${name}(${id})"
+        }
+    }
+
+    // Tuning ports, matches com.dolby.dax.DsTuning.
+    enum class DsPort(val id: Int) {
+        INTERNAL_SPEAKER(0),
+        HDMI(1),
+        MIRACAST(2),
+        HEADPHONE(3),
+        BLUETOOTH(4),
+        USB(5);
 
         override fun toString(): String {
             return "${name}(${id})"

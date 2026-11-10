@@ -1,0 +1,2 @@
+# DolbyManager runs as system_app and tells the Dolby media service the active output device
+hal_client_domain(system_app, hal_dms)

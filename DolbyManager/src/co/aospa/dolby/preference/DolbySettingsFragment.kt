@@ -111,6 +111,8 @@ class DolbySettingsFragment : SettingsBasePreferenceFragment(),
         switchBar.addOnSwitchChangeListener(this)
         switchBar.setChecked(dsOn)
 
+        spkVirtPref.isVisible = !dolbyController.isMonoSpeaker
+
         profilePref.onPreferenceChangeListener = this
         updateProfileIcon(profile)
         profilePref.setEnabled(dsOn)
