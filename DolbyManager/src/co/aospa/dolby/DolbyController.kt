@@ -131,6 +131,7 @@ internal class DolbyController private constructor(
 
     fun onBootCompleted() {
         dlog(TAG, "onBootCompleted")
+        migrateCustomProfile()
         restoreAllSettings()
         audioManager!!.setAudioServerStateCallback(context.mainExecutor, audioServerStateCallback)
         startWatchingRoutes()
@@ -154,6 +155,39 @@ internal class DolbyController private constructor(
 
         // Finally restore the current profile.
         setCurrentProfile()
+    }
+
+    // Profile 3 used to be Custom, Sony's tuning makes it Voice and adds Custom as profile 8.
+    // Move what was customized on the old profile 3 over to the new Custom profile, once.
+    private fun migrateCustomProfile() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        if (prefs.getBoolean(PREF_CUSTOM_PROFILE_MIGRATED, false)) return
+        dlog(TAG, "migrateCustomProfile")
+
+        val oldPrefs =
+            context.getSharedPreferences("profile_$OLD_CUSTOM_PROFILE", Context.MODE_PRIVATE)
+        val newPrefs =
+            context.getSharedPreferences("profile_$CUSTOM_PROFILE", Context.MODE_PRIVATE)
+        newPrefs.edit().apply {
+            oldPrefs.all.forEach { (key, value) ->
+                when (value) {
+                    is Boolean -> putBoolean(key, value)
+                    is Int -> putInt(key, value)
+                    is Long -> putLong(key, value)
+                    is Float -> putFloat(key, value)
+                    is String -> putString(key, value)
+                    is Set<*> -> putStringSet(key, value.filterIsInstance<String>().toSet())
+                }
+            }
+        }.commit()
+        oldPrefs.edit().clear().commit()
+
+        prefs.edit().apply {
+            if (prefs.getString(DolbyConstants.PREF_PROFILE, null) == "$OLD_CUSTOM_PROFILE") {
+                putString(DolbyConstants.PREF_PROFILE, "$CUSTOM_PROFILE")
+            }
+            putBoolean(PREF_CUSTOM_PROFILE_MIGRATED, true)
+        }.commit()
     }
 
     private fun restoreSettings(profile: Int) {
@@ -540,6 +574,9 @@ internal class DolbyController private constructor(
     companion object {
         private const val TAG = "DolbyController"
         private const val EFFECT_PRIORITY = 100
+        private const val OLD_CUSTOM_PROFILE = 3
+        private const val CUSTOM_PROFILE = 8
+        private const val PREF_CUSTOM_PROFILE_MIGRATED = "custom_profile_migrated"
 
         @Volatile
         private var instance: DolbyController? = null

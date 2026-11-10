@@ -389,7 +389,8 @@ class DolbySettingsFragment : SettingsBasePreferenceFragment(),
             0 -> profilePref.setIcon(R.drawable.ic_profile_dynamic)
             1 -> profilePref.setIcon(R.drawable.ic_profile_movie)
             2 -> profilePref.setIcon(R.drawable.ic_profile_music)
-            3 -> profilePref.setIcon(R.drawable.ic_profile_custom)
+            3 -> profilePref.setIcon(R.drawable.ic_profile_voice)
+            8 -> profilePref.setIcon(R.drawable.ic_profile_custom)
             else -> profilePref.setIcon(R.drawable.ic_dolby)
         }
     }
