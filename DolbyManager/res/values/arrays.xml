@@ -88,11 +88,12 @@
         <item>@string/dolby_detailed</item>
     </string-array>
 
+    <!-- Preset numbers of the tuning: 1 is detailed, 2 is balanced and 3 is warm. -->
     <string-array name="dolby_ieq_values">
         <item>0</item>
-        <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>1</item>
     </string-array>
 
 </resources>
