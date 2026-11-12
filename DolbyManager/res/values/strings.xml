@@ -37,6 +37,7 @@
     <string name="dolby_reverb_reduction_summary">Reduces room echo in voices and recordings</string>
     <string name="dolby_reverb_reduction_amount">Reverb reduction amount</string>
     <string name="dolby_connect_headphones">Connect headphones</string>
+    <string name="dolby_speaker_only">Only available on the speaker</string>
     <string name="dolby_reset_profile">Reset to defaults</string>
     <string name="dolby_reset_profile_toast">Successfully reset settings for %1$s profile</string>
 

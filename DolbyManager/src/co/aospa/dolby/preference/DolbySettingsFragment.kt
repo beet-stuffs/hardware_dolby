@@ -254,6 +254,9 @@ class DolbySettingsFragment : SettingsBasePreferenceFragment(),
 
             PREF_BASS -> {
                 dolbyController.setBassEnhancerEnabled(newValue as Boolean, output)
+                // Turning the bass enhancer off also turns virtual bass off in the DSP, so put
+                // it back to what is shown.
+                dolbyController.setVirtualBassEnabled(virtualBassPref.isChecked, output)
             }
 
             PREF_VIRTUAL_BASS -> {
@@ -296,6 +299,7 @@ class DolbySettingsFragment : SettingsBasePreferenceFragment(),
     private fun updateProfileSpecificPrefs() {
         val unknownRes = getString(R.string.dolby_unknown)
         val headphoneRes = getString(R.string.dolby_connect_headphones)
+        val speakerRes = getString(R.string.dolby_speaker_only)
         val dsOn = dolbyController.dsOn
         val currentProfile = dolbyController.profile
 
@@ -311,10 +315,12 @@ class DolbySettingsFragment : SettingsBasePreferenceFragment(),
 
         val enable = dsOn && (currentProfile != -1)
         listOf(
-            geqPref, presetPref, spkVirtPref, ieqPref, ieqAmountPref, dialoguePref, duckingPref,
-            volumePref, volumeAmountPref, bassPref, virtualBassPref, reverbPref,
-            reverbAmountPref, resetPref
+            geqPref, presetPref, ieqPref, ieqAmountPref, dialoguePref, duckingPref,
+            volumePref, volumeAmountPref, bassPref, reverbPref, reverbAmountPref, resetPref
         ).forEach { it.setEnabled(enable) }
+        // These only do something on the speaker, the headphone virtualizer is the reverse.
+        spkVirtPref.setEnabled(enable && isOnSpeaker)
+        virtualBassPref.setEnabled(enable && isOnSpeaker)
         hpVirtPref.setEnabled(enable && !isOnSpeaker)
         stereoPref.setEnabled(enable && !isOnSpeaker)
 
@@ -360,6 +366,13 @@ class DolbySettingsFragment : SettingsBasePreferenceFragment(),
         )
         reverbPref.setChecked(dolbyController.getReverbReductionEnabled(currentProfile))
         reverbAmountPref.value = dolbyController.getReverbReductionAmount(currentProfile)
+
+        spkVirtPref.summary = if (isOnSpeaker) null else speakerRes
+        virtualBassPref.summary = if (isOnSpeaker) {
+            getString(R.string.dolby_virtual_bass_summary)
+        } else {
+            speakerRes
+        }
 
         // below prefs are not enabled on loudspeaker
         if (isOnSpeaker) {
