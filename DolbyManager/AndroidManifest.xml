@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2023-24 Paranoid Android
+               (C) 2026 PixelOS
      SPDX-License-Identifier: Apache-2.0
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="co.aospa.dolby"
+    package="net.pixelos.dolby"
     android:sharedUserId="android.uid.system">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -45,7 +46,7 @@
             <meta-data android:name="com.android.settings.category"
                        android:value="com.android.settings.category.ia.sound" />
             <meta-data android:name="com.android.settings.summary_uri"
-                       android:value="content://co.aospa.dolby.summary/dolby" />
+                       android:value="content://net.pixelos.dolby.summary/dolby" />
         </activity>
 
         <activity
@@ -72,7 +73,7 @@
 
         <provider
             android:name=".SummaryProvider"
-            android:authorities="co.aospa.dolby.summary">
+            android:authorities="net.pixelos.dolby.summary">
         </provider>
 
     </application>
