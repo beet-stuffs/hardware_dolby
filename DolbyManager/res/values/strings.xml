@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2023-24 Paranoid Android
+               (C) 2026 PixelOS
      SPDX-License-Identifier: Apache-2.0
 -->
 <resources>
@@ -40,6 +41,21 @@
     <string name="dolby_speaker_only">Only available on the speaker</string>
     <string name="dolby_reset_profile">Reset to defaults</string>
     <string name="dolby_reset_profile_toast">Successfully reset settings for %1$s profile</string>
+    <string name="dolby_reset_profile_dialog_title">Reset %1$s profile?</string>
+    <string name="dolby_reset_profile_dialog_text">All settings of this profile, including the equalizer, go back to their defaults for both the speaker and headphones.</string>
+    <string name="dolby_reset">Reset</string>
+
+    <!-- Dolby settings sections -->
+    <string name="dolby_category_profile">Profile</string>
+    <string name="dolby_category_equalizer">Equalizer</string>
+    <string name="dolby_category_spatial">Spatial audio</string>
+    <string name="dolby_category_dialogue">Dialogue</string>
+    <string name="dolby_category_bass">Bass</string>
+    <string name="dolby_category_volume">Volume &amp; room</string>
+
+    <!-- Output whose settings are shown -->
+    <string name="dolby_output_footer_speaker">Showing speaker settings. The speaker and headphones each have their own settings.</string>
+    <string name="dolby_output_footer_headphone">Showing headphone settings. The speaker and headphones each have their own settings.</string>
 
     <!-- Dolby profiles -->
     <string name="dolby_profile_dynamic">Dynamic</string>
@@ -72,6 +88,11 @@
     <string name="dolby_geq_reset_gains_prompt">Do you want to reset this preset to defaults?</string>
     <string name="dolby_geq_preset_name_exists">Preset name already exists!</string>
     <string name="dolby_geq_preset_name_too_long">Preset name is too long!</string>
+    <string name="dolby_geq_more_options">More options</string>
+    <string name="dolby_geq_frequency_response">Frequency response</string>
+    <string name="dolby_geq_db">%1$s dB</string>
+    <string name="dolby_geq_band_hz">%1$s Hz</string>
+    <string name="dolby_geq_band_khz">%1$s kHz</string>
 
     <!-- Dolby intelligent EQ -->
     <string name="dolby_ieq">Intelligent equalizer</string>
