@@ -1,6 +1,7 @@
 //
 // Copyright (C) 2017-2021 The LineageOS Project
 //           (C) 2023-24 Paranoid Android
+//           (C) 2026 PixelOS
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -21,8 +22,9 @@ android_app {
         "SpaLib",
         "androidx.activity_activity-compose",
         "androidx.compose.material3_material3",
+        "androidx.compose.material_material-icons-extended",
         "androidx.compose.runtime_runtime",
+        "androidx.lifecycle_lifecycle-runtime-compose",
         "androidx.preference_preference",
-        "com.google.android.material_material",
     ],
 }
